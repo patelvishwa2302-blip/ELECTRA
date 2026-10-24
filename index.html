@@ -1,0 +1,862 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>⚡ Electra — Polypharmacy Safety System</title>
+  <link rel="stylesheet" href="style.css" />
+  <!-- Devanagari font for Hindi text -->
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari&display=swap" rel="stylesheet" />
+  <style>
+    /* ── BASE & LAYOUT OVERRIDES FOR 4-TAB SYSTEM ──────────────── */
+    body {
+      display: flex;
+      flex-direction: column;
+      min-height: 100vh;
+      background: var(--bg-dark);
+      color: var(--text-primary);
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    }
+
+    /* ── PERSISTENT VERDICT STRIP ─────────────────────────────── */
+    .verdict-strip {
+      background: var(--bg-card);
+      border-bottom: 1px solid var(--border);
+      padding: 10px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 16px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.04);
+      position: sticky;
+      top: 0;
+      z-index: 20;
+    }
+
+    .verdict-left {
+      display: flex;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .verdict-chip {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 6px 14px;
+      border-radius: 20px;
+      font-size: 0.85rem;
+      font-weight: 800;
+      letter-spacing: 0.5px;
+      border: 1.5px solid var(--border);
+      background: var(--bg-input);
+      color: var(--text-muted);
+    }
+
+    .verdict-chip.none {
+      border-color: var(--border);
+      background: var(--bg-input);
+      color: var(--text-muted);
+    }
+
+    .verdict-chip.low {
+      border-color: var(--risk-low);
+      background: rgba(5, 150, 105, 0.1);
+      color: var(--risk-low);
+    }
+
+    .verdict-chip.moderate {
+      border-color: var(--risk-mod);
+      background: rgba(217, 119, 6, 0.1);
+      color: var(--risk-mod);
+    }
+
+    .verdict-chip.high {
+      border-color: var(--risk-high);
+      background: rgba(220, 38, 38, 0.1);
+      color: var(--risk-high);
+    }
+
+    .verdict-chip.critical {
+      border-color: var(--risk-crit);
+      background: rgba(153, 27, 27, 0.15);
+      color: var(--risk-crit);
+      animation: flash 1.5s infinite;
+    }
+
+    .verdict-item {
+      font-size: 0.88rem;
+      color: var(--text-primary);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .verdict-item-label {
+      color: var(--text-muted);
+      font-weight: 600;
+    }
+
+    .verdict-patient {
+      font-size: 0.88rem;
+      color: var(--text-primary);
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      padding: 5px 12px;
+      border-radius: 6px;
+      max-width: 420px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+      font-weight: 600;
+    }
+
+    .verdict-analyze-btn {
+      margin: 0 !important;
+      width: auto !important;
+      padding: 8px 20px !important;
+      font-size: 0.95rem !important;
+    }
+
+    /* ── TAB BAR NAVIGATION ───────────────────────────────────── */
+    .tab-nav {
+      display: flex;
+      gap: 4px;
+      padding: 12px 24px 0;
+      background: var(--bg-dark);
+      border-bottom: 2px solid var(--border);
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      padding: 11px 22px;
+      font-size: 0.92rem;
+      font-weight: 700;
+      border: 1px solid var(--border);
+      border-bottom: none;
+      border-radius: 8px 8px 0 0;
+      background: #cbd5e1;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+      margin-bottom: -2px;
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      background: #e2e8f0;
+      color: var(--text-primary);
+    }
+
+    .tab-btn.active {
+      background: var(--bg-card);
+      color: var(--accent-dark);
+      border-color: var(--border);
+      border-bottom: 2px solid var(--bg-card);
+      box-shadow: 0 -2px 6px rgba(0, 0, 0, 0.04);
+    }
+
+    .tab-alert-badge {
+      background: var(--risk-high);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 2px 7px;
+      border-radius: 10px;
+      line-height: 1;
+    }
+
+    /* ── TAB CONTENT CONTAINERS ───────────────────────────────── */
+    .tab-content-area {
+      flex: 1;
+      background: var(--bg-card);
+      min-height: calc(100vh - 280px);
+    }
+
+    .tab-pane {
+      display: none;
+      padding: 24px;
+    }
+
+    .tab-pane.active {
+      display: block;
+    }
+
+    /* ── 2-COLUMN GRID ────────────────────────────────────────── */
+    .grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+    }
+
+    @media (max-width: 960px) {
+      .grid-2col {
+        grid-template-columns: 1fr;
+      }
+    }
+
+    .card-panel {
+      background: var(--bg-card);
+      border: 1px solid #cbd5e1;
+      border-radius: 10px;
+      padding: 20px;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.02);
+    }
+
+    /* ── PATIENT PRESETS TOOLBAR ──────────────────────────────── */
+    .preset-bar {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 6px;
+      align-items: center;
+      margin-bottom: 16px;
+      padding: 10px 12px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    .preset-label {
+      font-size: 0.8rem;
+      font-weight: 800;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      margin-right: 4px;
+    }
+
+    .preset-btn {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 6px;
+      padding: 6px 10px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      color: var(--text-primary);
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .preset-btn:hover {
+      background: var(--accent);
+      color: #ffffff;
+      border-color: var(--accent);
+    }
+
+    .preset-btn.clear-btn:hover {
+      background: var(--risk-high);
+      color: #ffffff;
+      border-color: var(--risk-high);
+    }
+
+    /* ── PATIENT PROFILE CLUSTERS ─────────────────────────────── */
+    .patient-cluster {
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 14px;
+      margin-bottom: 12px;
+    }
+
+    .cluster-title {
+      font-size: 0.8rem;
+      font-weight: 800;
+      text-transform: uppercase;
+      letter-spacing: 1px;
+      color: var(--accent-dark);
+      margin-bottom: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+    }
+
+    .checkbox-grid-2col {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 8px 12px;
+    }
+
+    details.patient-cluster summary {
+      cursor: pointer;
+      outline: none;
+      user-select: none;
+    }
+
+    details.patient-cluster summary::-webkit-details-marker {
+      display: none;
+    }
+
+    /* ── REPORT TAB (FULL WIDTH) ──────────────────────────────── */
+    .report-container {
+      max-width: 1200px;
+      margin: 0 auto;
+    }
+
+    /* ── WHATSAPP BANNER, UNKNOWN WARNING & AUDIT TRAIL ──────── */
+    .whatsapp-banner {
+      display: none;
+      background: rgba(16, 185, 129, 0.12);
+      border: 1px solid #10b981;
+      color: #047857;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+
+    .whatsapp-banner.show {
+      display: block;
+    }
+
+    .unknown-warning {
+      display: none;
+      background: rgba(217, 119, 6, 0.12);
+      border: 1px solid #d97706;
+      color: #b45309;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-weight: 700;
+      margin-bottom: 16px;
+      font-size: 0.9rem;
+    }
+
+    .unknown-warning.show {
+      display: block;
+    }
+
+    .audit-section {
+      margin-top: 16px;
+    }
+
+    .audit-toggle {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      padding: 8px 14px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      border-radius: 6px;
+      cursor: pointer;
+      color: var(--text-primary);
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all 0.2s;
+    }
+
+    .audit-toggle:hover {
+      background: var(--bg-dark);
+    }
+
+    .audit-content {
+      display: none;
+      margin-top: 12px;
+      padding: 14px;
+      background: var(--bg-input);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      font-size: 0.85rem;
+      line-height: 1.6;
+      color: var(--text-primary);
+    }
+
+    .audit-content.show {
+      display: block;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- ── HEADER ────────────────────────────────────────────── -->
+  <div class="header">
+    <div>
+      <h1>⚡ ELECTRA</h1>
+      <div class="subtitle">AI-Powered Polypharmacy Detection &amp; Drug Safety</div>
+    </div>
+    <div style="text-align:right; font-size:0.85rem; color: var(--text-muted);">
+      <span class="status-dot"></span> Backend Connected
+      <div id="device-id" style="margin-top:2px;">Device: web-dashboard</div>
+    </div>
+  </div>
+
+  <!-- ── PERSISTENT VERDICT STRIP ──────────────────────────── -->
+  <div class="verdict-strip">
+    <div class="verdict-left">
+      <div id="verdict-risk-chip" class="verdict-chip none">No Analysis Yet</div>
+      <div class="verdict-item">
+        <span class="verdict-item-label">Medicines:</span>
+        <strong id="verdict-med-count">0 medicines</strong>
+      </div>
+      <div class="verdict-item">
+        <span class="verdict-item-label">Alerts:</span>
+        <strong id="verdict-alert-count">—</strong>
+      </div>
+      <div class="verdict-patient">
+        <span class="verdict-item-label">Patient:</span>
+        <strong id="verdict-patient-summary">No profile set</strong>
+      </div>
+    </div>
+    <div class="verdict-right">
+      <button class="btn btn-analyze verdict-analyze-btn" onclick="analyzeClick()">
+        🔍 ANALYZE
+      </button>
+    </div>
+  </div>
+
+  <!-- ── TAB BAR ───────────────────────────────────────────── -->
+  <nav class="tab-nav">
+    <button class="tab-btn active" data-tab="tab-input" onclick="switchTab('tab-input')">
+      1 · 💊 Input
+    </button>
+    <button class="tab-btn" data-tab="tab-report" onclick="switchTab('tab-report')">
+      2 · 📋 Report
+      <span id="report-tab-badge" class="tab-alert-badge" style="display:none;"></span>
+    </button>
+    <button class="tab-btn" data-tab="tab-tags" onclick="switchTab('tab-tags')">
+      3 · 🏷️ Tags &amp; ⏰ Reminders
+    </button>
+    <button class="tab-btn" data-tab="tab-record" onclick="switchTab('tab-record')">
+      4 · 📜 Record &amp; About
+    </button>
+  </nav>
+
+  <!-- ── TAB CONTENT AREA ─────────────────────────────────── -->
+  <main class="tab-content-area">
+
+    <!-- ════════════════════════════════════════════════════════
+         TAB 1 — INPUT (2 Columns)
+    ════════════════════════════════════════════════════════ -->
+    <div class="tab-pane active" id="tab-input">
+      <div class="grid-2col">
+
+        <!-- LEFT COLUMN: Medicines, Ayurvedic, Food Checklist -->
+        <div class="card-panel">
+          <div class="panel-title">💊 Medicine Scanner</div>
+
+          <!-- Medicine Input -->
+          <div class="form-group">
+            <label>Add Medicine (brand name)</label>
+            <div style="display:flex; gap:6px;">
+              <input type="text" id="med-input" placeholder="e.g. Ecosprin 75, Brufen..." autocomplete="off" />
+              <button class="btn btn-secondary" onclick="addMedicine()" style="width:auto; padding:8px 14px;">Add</button>
+            </div>
+            <!-- Autocomplete dropdown -->
+            <div id="autocomplete-list" style="position:relative;"></div>
+          </div>
+
+          <!-- Scanned Medicines Display -->
+          <div class="section-label">Scanned Medicines</div>
+          <div id="med-tags-container" style="min-height:42px; padding:6px 0;">
+            <span style="font-size:0.85rem; color:var(--text-muted);">No medicines added yet</span>
+          </div>
+
+          <!-- Ayurvedic Section -->
+          <div class="section-label">🌿 Ayurvedic / Herbal Medicines</div>
+          <div class="form-group">
+            <label>Add Ayurvedic / Herbal Medicine</label>
+            <div style="display:flex; gap:6px;">
+              <input type="text" id="ayurvedic-input" placeholder="e.g. Ashwagandha, Chyawanprash..." autocomplete="off" />
+              <button class="btn btn-secondary" style="width:auto; padding:8px 14px;" onclick="addAyurvedic()">Add</button>
+            </div>
+          </div>
+          <div id="ayurvedic-tags" style="min-height:24px; margin-bottom:12px;"></div>
+
+          <!-- Food Checklist -->
+          <div class="section-label">🍊 Food / Drink Checklist</div>
+          <div class="checkbox-group" style="margin-bottom:12px;">
+            <label class="checkbox-item">
+              <input type="checkbox" value="grapefruit_juice" class="food-check"> Grapefruit juice
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" value="dairy" class="food-check"> Dairy (milk/curd)
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" value="alcohol" class="food-check"> Alcohol
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" value="high_vitamin_k" class="food-check"> Spinach/Kale
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" value="banana_coconut_water" class="food-check"> Banana/Coconut water
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" value="tyramine_foods" class="food-check"> Aged cheese/Red wine
+            </label>
+            <label class="checkbox-item">
+              <input type="checkbox" value="milk_thyroid" class="food-check"> Morning milk (thyroid patients)
+            </label>
+          </div>
+        </div>
+
+        <!-- RIGHT COLUMN: Patient Profile Clusters + Action Buttons -->
+        <div class="card-panel">
+          <div class="panel-title">👤 Patient Profile</div>
+
+          <!-- Presets toolbar -->
+          <div class="preset-bar">
+            <span class="preset-label">Presets:</span>
+            <button type="button" class="preset-btn" onclick="applyPatientPreset('dadi')">👵 Dadi, 72</button>
+            <button type="button" class="preset-btn" onclick="applyPatientPreset('pregnant')">🤰 Pregnant, 28</button>
+            <button type="button" class="preset-btn" onclick="applyPatientPreset('feeding')">🍼 Feeding, 30</button>
+            <button type="button" class="preset-btn" onclick="applyPatientPreset('healthy')">🧑 Healthy, 40</button>
+            <button type="button" class="preset-btn clear-btn" onclick="applyPatientPreset('clear')">✖ Clear</button>
+          </div>
+
+          <!-- Cluster 1: Basics -->
+          <div class="patient-cluster">
+            <div class="cluster-title">Basics</div>
+            <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px;">
+              <div class="form-group" style="margin-bottom:0;">
+                <label>Age</label>
+                <input type="number" id="patient-age" placeholder="e.g. 72" min="1" max="120" />
+              </div>
+              <div class="form-group" style="margin-bottom:0;">
+                <label>Kidney Function</label>
+                <select id="p-kidney-fn">
+                  <option value="normal">Normal</option>
+                  <option value="mild">Mild impairment</option>
+                  <option value="moderate">Moderate impairment</option>
+                  <option value="severe">Severe / Dialysis</option>
+                </select>
+              </div>
+            </div>
+            <div class="form-group" style="margin-top:10px; margin-bottom:0;">
+              <label>Biological Sex</label>
+              <div style="display:flex; gap:16px; font-size:0.88rem; margin:4px 0; color:var(--text-primary); font-weight:600;">
+                <label style="cursor:pointer;"><input type="radio" name="p-sex" value="male" checked onchange="toggleFemaleFields()"> Male</label>
+                <label style="cursor:pointer;"><input type="radio" name="p-sex" value="female" onchange="toggleFemaleFields()"> Female</label>
+              </div>
+            </div>
+          </div>
+
+          <!-- Cluster 2: Conditions (2 per row) -->
+          <div class="patient-cluster">
+            <div class="cluster-title">Conditions</div>
+            <div class="checkbox-grid-2col">
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-diabetes"> Diabetes
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-hypertension"> Hypertension
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-ckd"> Kidney Disease (CKD)
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-liver"> Liver Disease
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-hf"> Heart failure
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-gi"> History of stomach ulcer / GI bleeding
+              </label>
+            </div>
+          </div>
+
+          <!-- Cluster 3: Life stage (shown only when Female selected) -->
+          <div id="female-fields" class="patient-cluster" style="display:none;">
+            <div class="cluster-title">Life stage</div>
+            <div class="checkbox-grid-2col">
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-pregnant" onchange="toggleFemaleFields()"> Pregnant
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-breastfeeding" onchange="toggleFemaleFields()"> Breastfeeding
+              </label>
+            </div>
+            <div id="pregnancy-banner" style="display:none; margin-top:12px; padding:10px;
+                 border-left:4px solid #d97706; background:rgba(217,119,6,0.10);
+                 font-size:0.85rem; color:var(--text-primary); line-height:1.5; font-weight:600; border-radius: 4px;">
+              ⚕️ Pregnancy / breastfeeding: Electra's guidance is limited.
+              All decisions must be made by your doctor.
+            </div>
+          </div>
+
+          <!-- Cluster 4: Lifestyle -->
+          <div class="patient-cluster">
+            <div class="cluster-title">Lifestyle</div>
+            <div class="checkbox-grid-2col">
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-alcohol"> Drinks alcohol regularly
+              </label>
+            </div>
+          </div>
+
+          <!-- Cluster 5: More conditions (Collapsible) -->
+          <details class="patient-cluster">
+            <summary class="cluster-title" style="cursor:pointer; user-select:none;">
+              <span>More conditions ▾</span>
+            </summary>
+            <div class="checkbox-grid-2col" style="margin-top:10px;">
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-hypokalemia"> Low potassium
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-hypomagnesemia"> Low magnesium
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-bradycardia"> Slow heart rate
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-dehydration"> Dehydration / poor fluid intake
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-copd"> COPD / chronic lung disease
+              </label>
+              <label class="checkbox-item">
+                <input type="checkbox" id="p-apnoea"> Sleep apnoea
+              </label>
+            </div>
+          </details>
+
+          <!-- Cluster 6: Caregiver alert -->
+          <div class="patient-cluster">
+            <div class="cluster-title">Caregiver alert</div>
+            <div class="form-group" style="margin-bottom:0;">
+              <label>Caregiver WhatsApp (+91XXXXXXXXXX)</label>
+              <input type="text" id="p-caregiver" placeholder="+91XXXXXXXXXX" />
+            </div>
+          </div>
+
+          <!-- Action Buttons in EXACT order (ANALYZE LAST) -->
+          <div style="margin-top:20px;">
+            <label class="btn btn-ocr" style="cursor:pointer; display:flex; align-items:center; justify-content:center;">
+              📷 Upload prescription photo
+              <input type="file" accept="image/*" id="ocr-file" onchange="uploadPrescription()" hidden />
+            </label>
+
+            <button class="btn btn-wa" onclick="notifyCaregiver()">
+              📱 Notify Caregiver (WhatsApp)
+            </button>
+
+            <button class="btn btn-hindi" id="speak-btn" onclick="speakHindi()">
+              🔊 Speak Alert in Hindi
+            </button>
+
+            <button class="btn btn-demo" onclick="loadDemo()" style="margin-top:0;">
+              ⚡ Load Demo (Ramesh, Age 72)
+            </button>
+
+            <button class="btn btn-analyze" id="analyze-btn" onclick="analyzeClick()">
+              🔍 ANALYZE
+            </button>
+          </div>
+
+        </div><!-- end right column -->
+
+      </div><!-- end grid-2col -->
+    </div><!-- end tab 1 -->
+
+    <!-- ════════════════════════════════════════════════════════
+         TAB 2 — REPORT (Full Width)
+    ════════════════════════════════════════════════════════ -->
+    <div class="tab-pane" id="tab-report">
+      <div class="report-container card-panel">
+        <div class="panel-title">📋 Risk Analysis Report</div>
+
+        <!-- Empty state (shown before first analysis) -->
+        <div class="empty-state" id="empty-state">
+          <div class="icon">🔍</div>
+          <p>Add medicines and patient details on the left, then press <strong>ANALYZE</strong>.</p>
+          <p style="margin-top:8px; font-size:0.85rem;">The analysis runs in under 3 seconds.</p>
+        </div>
+
+        <!-- Results container (hidden until analysis runs) -->
+        <div id="results-container" style="display:none;">
+
+          <!-- Overall Risk Badge -->
+          <div class="risk-badge" id="risk-badge">
+            <span class="risk-label" id="risk-label">LOW</span>
+            <span class="risk-desc" id="risk-desc">No significant interactions detected</span>
+          </div>
+
+          <!-- WhatsApp + Storage alerts -->
+          <div class="whatsapp-banner" id="whatsapp-banner">
+            📱 WhatsApp alert sent to caregiver ✅
+          </div>
+          <div class="unknown-warning" id="unknown-warning"></div>
+
+          <!-- Doctor / Patient Toggle -->
+          <div class="toggle-row">
+            <button class="toggle-btn active" id="toggle-doctor" onclick="setMode('doctor')">
+              🩺 Doctor View
+            </button>
+            <button class="toggle-btn" id="toggle-patient" onclick="setMode('patient')">
+              👤 Patient View
+            </button>
+            <button class="toggle-btn" id="toggle-hindi" onclick="setMode('hindi')">
+              🇮🇳 हिंदी
+            </button>
+          </div>
+
+          <!-- Polypharmacy Burden Score -->
+          <div class="section-label">📊 Polypharmacy Burden Score</div>
+          <div class="burden-section" id="burden-section">
+            <!-- filled by JS -->
+          </div>
+
+          <!-- Alert Cards -->
+          <div class="section-label">⚠️ Interaction Alerts</div>
+          <div id="alert-cards-container">
+            <!-- filled by JS -->
+          </div>
+
+          <!-- Dose Timing Schedule -->
+          <div class="timing-section">
+            <div class="section-label">⏰ Recommended Dose Timing Schedule</div>
+            <div id="timing-schedule">
+              <!-- filled by JS -->
+            </div>
+          </div>
+
+        </div><!-- end results-container -->
+      </div><!-- end report-container -->
+    </div><!-- end tab 2 -->
+
+    <!-- ════════════════════════════════════════════════════════
+         TAB 3 — TAGS & REMINDERS (Two Panels Side by Side)
+    ════════════════════════════════════════════════════════ -->
+    <div class="tab-pane" id="tab-tags">
+      <div class="grid-2col">
+
+        <!-- Left: NFC Tags -->
+        <div class="card-panel">
+          <div class="panel-title">🏷️ NFC Tags</div>
+          <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:14px; font-weight:500;">
+            Assign physical NFC pill bottle tags to scanned medicines for hardware box detection.
+          </p>
+
+          <div style="display:flex; gap:8px; align-items:center; margin:14px 0;">
+            <select id="tag-med" style="flex:1.4; padding:8px 10px; font-size:0.88rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px;"></select>
+            <select id="tag-uid" style="flex:1; padding:8px 10px; font-size:0.88rem; background: var(--bg-input); border: 1px solid var(--border); border-radius: 6px;"></select>
+            <button class="btn btn-ocr" style="padding:8px 16px; font-size:0.88rem; width: auto; margin: 0;" onclick="assignTag()">Assign</button>
+          </div>
+
+          <div class="section-label" style="margin-top:20px;">Assigned Tags</div>
+          <div id="tag-list" style="font-size:0.88rem; color:var(--text-muted); line-height:1.7; margin-top: 8px; background:var(--bg-input); padding:14px; border-radius:8px; border:1px solid var(--border);">
+            No tags assigned yet.
+          </div>
+        </div>
+
+        <!-- Right: Dose Reminders -->
+        <div class="card-panel">
+          <div class="panel-title">⏰ Dose Reminders</div>
+          <p style="font-size:0.88rem; color:var(--text-muted); margin-bottom:14px; font-weight:500;">
+            Configure scheduled reminder alarms. The box alarms at these times; the caregiver also gets a WhatsApp.
+          </p>
+
+          <div id="schedule-rows" style="margin:12px 0;"></div>
+
+          <div style="display:flex; gap:8px; margin-top:14px; flex-wrap:wrap;">
+            <button class="btn btn-secondary" style="padding:8px 14px; font-size:0.88rem; margin:0;" onclick="schedAdd()">+ Add time</button>
+            <button class="btn btn-ocr" style="padding:8px 14px; font-size:0.88rem; margin:0; width:auto;" onclick="saveSchedule()">Save</button>
+            <button class="btn btn-wa" style="padding:8px 14px; font-size:0.88rem; margin:0; width:auto;" onclick="testReminder()">Test reminder</button>
+          </div>
+          <div style="font-size:0.85rem; color:var(--text-muted); margin-top:14px; font-weight: 500;">
+            The box alarms at these times; the caregiver also gets a WhatsApp.
+          </div>
+        </div>
+
+      </div><!-- end grid-2col -->
+    </div><!-- end tab 3 -->
+
+    <!-- ════════════════════════════════════════════════════════
+         TAB 4 — RECORD & ABOUT (Two Columns)
+    ════════════════════════════════════════════════════════ -->
+    <div class="tab-pane" id="tab-record">
+      <div class="grid-2col">
+
+        <!-- Left Column: Prescription Timeline + Audit Trail -->
+        <div class="card-panel">
+          <div class="panel-title">📜 Prescription Timeline</div>
+
+          <div style="font-size:0.88rem; color:var(--text-muted); margin-bottom:12px; font-weight:600;">
+            Current medicines — color shows risk status
+          </div>
+
+          <div id="timeline-container">
+            <div style="font-size:0.88rem; color:var(--text-muted);">
+              Run an analysis to see the timeline.
+            </div>
+          </div>
+
+          <!-- Audit Trail -->
+          <div class="audit-section" style="margin-top:24px; border-top:1px solid var(--border); padding-top:16px;">
+            <button class="audit-toggle" onclick="toggleAudit()">
+              🔍 View Audit Trail
+            </button>
+            <div class="audit-content" id="audit-content">
+              <!-- filled by JS -->
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Column: Device Status Card + Why Electra is Different -->
+        <div class="card-panel">
+          <!-- Device Status Card -->
+          <div class="panel-title">📡 Device Status</div>
+          <div style="background:var(--bg-input); border:1px solid var(--border); border-radius:8px; padding:14px; margin-bottom:24px;">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:0.88rem;">
+              <div>
+                <span class="status-dot"></span> <strong>Backend:</strong> Connected
+              </div>
+              <div>
+                💻 <strong>Device:</strong> Dashboard Device
+              </div>
+              <div>
+                🏷️ <strong>Tags:</strong> <span id="status-tag-count">0 assigned</span>
+              </div>
+              <div>
+                ⏰ <strong>Reminders:</strong> <span id="status-sched-count">0 set</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Comparison Section -->
+          <div class="panel-title">🏆 Why Electra is Different</div>
+          <div style="font-size:0.88rem; color:var(--text-primary); line-height:1.75; font-weight:500;">
+            <div>✅ Indian brand name disambiguation</div>
+            <div>✅ Ayurvedic-allopathic interactions (world's first)</div>
+            <div>✅ Drug-food interaction checker</div>
+            <div>✅ Physical medicine lock (servo)</div>
+            <div>✅ Hindi patient explanations</div>
+            <div>✅ Caregiver WhatsApp alerts</div>
+            <div>✅ Deprescribing simulator</div>
+            <div>✅ Polypharmacy burden score</div>
+            <div>✅ Vital monitoring post-alert</div>
+            <div style="margin-top:10px; color:var(--risk-high); font-weight:700;">❌ Drugs.com — none of the above</div>
+            <div style="color:var(--risk-high); font-weight:700;">❌ Lexicomp — none of the above + costs $400/yr</div>
+          </div>
+        </div>
+
+      </div><!-- end grid-2col -->
+    </div><!-- end tab 4 -->
+
+  </main><!-- end tab-content-area -->
+
+<!-- ══════════════ MEDICAL DISCLAIMER FOOTER ══════════════ -->
+<footer style="margin-top:32px; padding:20px 24px; border-top:2px solid var(--bg-dark); font-size:0.78rem; color:var(--text-muted); line-height:1.7;">
+  <div style="font-weight:700; color:var(--text-primary); margin-bottom:6px;">⚕️ Medical Disclaimer</div>
+  Electra is an educational prototype designed to create general awareness about medicine safety
+  and potential drug interactions. It is <strong>not</strong> a medical device and does
+  <strong>not</strong> provide medical advice, diagnosis, or treatment. Always consult a qualified
+  doctor or pharmacist before starting, stopping, or changing any medicine — especially if you are
+  pregnant or breastfeeding, elderly, or living with kidney, liver, or heart disease. Medicines that
+  Electra cannot recognise must be verified with a doctor before use. Never delay or disregard
+  professional medical advice because of anything shown on this screen. The physical compartment
+  lock is a reminder aid, not a medical intervention. In an emergency, call
+  <strong>108</strong> (ambulance) or <strong>112</strong> (national emergency number) immediately.
+  <div style="margin-top:8px;">यह एक शैक्षिक प्रोटोटाइप है — किसी भी दवा को शुरू करने, बंद करने या
+  बदलने से पहले अपने डॉक्टर से सलाह लें। आपातकाल में 108 पर कॉल करें।</div>
+</footer>
+
+  <script src="app.js"></script>
+  <script src="dashboard_tabs.js"></script>
+</body>
+</html>

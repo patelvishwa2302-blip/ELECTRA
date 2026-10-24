@@ -1,0 +1,548 @@
+/* ============================================================
+   ELECTRA DASHBOARD — style.css
+   Theme: High-Contrast Premium Medical (Light)
+   ============================================================ */
+
+/* ── RESET & BASE ───────────────────────────────────────────── */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+:root {
+  /* High-Contrast Palette */
+  --bg-dark: #e2e8f0;       /* Slightly deeper grey background so white panels pop */
+  --bg-card: #ffffff;       /* Pure white panels */
+  --bg-input: #f8fafc;      
+  --border: #94a3b8;        /* Crisper, darker borders for inputs */
+  --text-primary: #0f172a;  /* Near black for maximum readability (not faded!) */
+  --text-muted: #334155;    /* Dark slate for secondary text (very easy to read) */
+  --risk-low: #059669;      /* Deep safe green */
+  --risk-mod: #d97706;      /* Deep warning orange */
+  --risk-high: #dc2626;     /* Deep danger red */
+  --risk-crit: #991b1b;     /* Critical dark red */
+  --accent: #2563eb;        /* Professional Medical Blue */
+  --accent-dark: #1e40af;   
+}
+
+body {
+  font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-primary);
+  min-height: 100vh;
+}
+
+/* ── HEADER ─────────────────────────────────────────────────── */
+.header {
+  background: var(--bg-card);
+  border-bottom: 1px solid var(--border);
+  padding: 12px 24px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
+  position: relative;
+  z-index: 10;
+}
+
+.header h1 {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--accent-dark); 
+  letter-spacing: 1px;
+}
+
+.header .subtitle {
+  font-size: 0.8rem;
+  color: var(--text-muted);
+  margin-top: 2px;
+  font-weight: 600;
+}
+
+.header .status-dot {
+  width: 8px;
+  height: 8px;
+  background: var(--risk-low);
+  border-radius: 50%;
+  display: inline-block;
+  margin-right: 6px;
+  animation: pulse 2s infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
+
+/* ── MAIN GRID — 3 panels ───────────────────────────────────── */
+.main-grid {
+  display: grid;
+  grid-template-columns: 320px 1fr 320px;
+  gap: 0;
+  height: calc(100vh - 56px);
+  overflow: hidden;
+}
+
+.panel {
+  border-right: 1px solid #cbd5e1;
+  background: var(--bg-card);
+  overflow-y: auto;
+  padding: 20px;
+}
+
+.panel:last-child { border-right: none; }
+
+.panel-title {
+  font-size: 0.8rem;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 1.5px;
+  color: var(--accent-dark);
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 2px solid #e2e8f0;
+}
+
+/* ── FORM ELEMENTS ──────────────────────────────────────────── */
+.form-group {
+  margin-bottom: 14px;
+}
+
+.form-group label {
+  display: block;
+  font-size: 0.82rem;
+  color: var(--text-primary); /* Made labels dark and crisp */
+  margin-bottom: 5px;
+  font-weight: 700;
+}
+
+input[type="text"],
+input[type="number"],
+select {
+  width: 100%;
+  background: var(--bg-input);
+  border: 1px solid var(--border); /* Darker borders */
+  border-radius: 6px;
+  color: var(--text-primary);
+  padding: 10px 12px;
+  font-size: 0.9rem;
+  font-weight: 500;
+  outline: none;
+  transition: all 0.2s;
+}
+
+input:focus, select:focus {
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.2);
+  background: #ffffff;
+}
+
+/* Medicine tags */
+.med-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 5px 12px;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 3px;
+  cursor: pointer;
+  transition: all 0.2s;
+  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
+  color: var(--text-primary);
+}
+
+.med-tag:hover { border-color: var(--risk-high); box-shadow: 0 2px 4px rgba(220, 38, 38, 0.2); }
+.med-tag.risky { border-color: var(--risk-high); background: rgba(239,68,68,0.1); color: var(--risk-crit); }
+.med-tag .remove { color: var(--text-muted); font-size: 0.9rem; }
+.med-tag .remove:hover { color: var(--risk-high); }
+
+/* Checkboxes */
+.checkbox-group {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin-top: 4px;
+}
+
+.checkbox-item {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+}
+
+.checkbox-item input[type="checkbox"] {
+  width: 16px;
+  height: 16px;
+  accent-color: var(--accent);
+}
+
+/* ── BUTTON STYLES (Professional Suite) ─────────────────────── */
+.btn {
+  width: 100%;
+  padding: 10px 16px;
+  border: none;
+  border-radius: 8px;
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  margin-bottom: 8px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+
+.btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+}
+
+.btn:active {
+  transform: translateY(0);
+}
+
+/* Individual Button Colors */
+.btn-ocr { background: #3b82f6; color: #ffffff; } /* Bright Medical Blue */
+.btn-ocr:hover { background: #2563eb; }
+
+.btn-wa { background: #10b981; color: #ffffff; } /* Deep WhatsApp Green */
+.btn-wa:hover { background: #059669; }
+
+.btn-hindi { background: #8b5cf6; color: #ffffff; } /* Soft Indigo */
+.btn-hindi:hover { background: #7c3aed; }
+
+.btn-analyze { 
+  background: #ef4444; 
+  color: #ffffff; 
+  font-size: 1.1rem; 
+  padding: 14px; 
+  letter-spacing: 1px; 
+  margin-top: 8px;
+}
+.btn-analyze:hover { background: #dc2626; }
+.btn-analyze.loading { background: var(--border); cursor: not-allowed; color: var(--text-muted); }
+
+.btn-demo {
+  background: #ffffff;
+  color: var(--accent-dark);
+  border: 2px solid var(--accent);
+}
+.btn-demo:hover { background: var(--bg-dark); }
+
+.btn-secondary {
+  background: #ffffff;
+  color: var(--text-primary);
+  border: 1px solid var(--border);
+  width: auto;
+  padding: 8px 12px;
+  font-size: 0.8rem;
+  box-shadow: none;
+}
+.btn-secondary:hover { background: var(--bg-dark); }
+
+/* ── RISK BADGE (BIG) ───────────────────────────────────────── */
+.risk-badge {
+  text-align: center;
+  padding: 24px;
+  border-radius: 12px;
+  margin-bottom: 20px;
+  border: 2px solid;
+  background: #ffffff;
+  box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.risk-badge .risk-label {
+  font-size: 2.5rem;
+  font-weight: 900;
+  letter-spacing: 2px;
+  display: block;
+}
+
+.risk-badge .risk-desc {
+  font-size: 0.9rem;
+  margin-top: 6px;
+  font-weight: 600;
+}
+
+.risk-badge.low { border-color: var(--risk-low); background: rgba(5,150,105,0.05); color: var(--risk-low); }
+.risk-badge.moderate { border-color: var(--risk-mod); background: rgba(217,119,6,0.05); color: var(--risk-mod); }
+.risk-badge.high { border-color: var(--risk-high); background: rgba(220,38,38,0.05); color: var(--risk-high); }
+.risk-badge.critical { border-color: var(--risk-crit); background: rgba(153,27,27,0.1); color: var(--risk-crit);
+  animation: flash 1.5s infinite; }
+
+@keyframes flash {
+  0%, 100% { box-shadow: 0 0 0px rgba(220,38,38,0); }
+  50% { box-shadow: 0 0 20px rgba(220,38,38,0.4); }
+}
+
+/* ── TOGGLE BUTTON (Doctor / Patient) ───────────────────────── */
+.toggle-row {
+  display: flex;
+  gap: 0;
+  margin-bottom: 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  overflow: hidden;
+  background: var(--bg-input);
+}
+
+.toggle-btn {
+  flex: 1;
+  padding: 12px;
+  border: none;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  font-size: 0.85rem;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.toggle-btn.active {
+  background: var(--accent);
+  color: white;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* ── RISK CARDS ─────────────────────────────────────────────── */
+.risk-card {
+  background: #ffffff;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+  margin-bottom: 16px;
+  border-left: 6px solid;
+  transition: transform 0.2s, box-shadow 0.2s;
+  box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.risk-card:hover { transform: translateX(3px); box-shadow: 0 6px 12px rgba(0,0,0,0.08); }
+.risk-card.low { border-left-color: var(--risk-low); }
+.risk-card.moderate { border-left-color: var(--risk-mod); }
+.risk-card.high { border-left-color: var(--risk-high); }
+.risk-card.critical { border-left-color: var(--risk-crit); }
+
+.risk-card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.risk-card-title {
+  font-size: 1rem;
+  font-weight: 800;
+  color: var(--text-primary);
+}
+
+.severity-chip {
+  font-size: 0.75rem;
+  font-weight: 800;
+  padding: 4px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.severity-chip.low { background: rgba(5,150,105,0.15); color: #047857; }
+.severity-chip.moderate{ background: rgba(217,119,6,0.15); color: #b45309; }
+.severity-chip.high { background: rgba(220,38,38,0.15); color: #b91c1c; }
+.severity-chip.critical{ background: rgba(153,27,27,0.2); color: #7f1d1d; }
+
+.risk-meds-involved {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+
+.med-pill {
+  font-size: 0.8rem;
+  padding: 4px 12px;
+  border-radius: 12px;
+  background: rgba(220,38,38,0.08);
+  color: var(--risk-crit);
+  border: 1px solid rgba(220,38,38,0.2);
+  font-weight: 700;
+}
+
+.risk-explanation {
+  font-size: 0.9rem;
+  color: var(--text-primary);
+  line-height: 1.6;
+  margin-bottom: 12px;
+  font-weight: 500;
+}
+
+.evidence-badge {
+  display: inline-block;
+  font-size: 0.75rem;
+  padding: 4px 8px;
+  border-radius: 6px;
+  background: rgba(37,99,235,0.1);
+  color: var(--accent-dark);
+  border: 1px solid rgba(37,99,235,0.2);
+  margin-bottom: 10px;
+  font-weight: 700;
+}
+
+.risk-action {
+  font-size: 0.85rem;
+  color: #047857;
+  background: rgba(5,150,105,0.08);
+  border: 1px solid rgba(5,150,105,0.2);
+  border-radius: 6px;
+  padding: 10px 14px;
+  margin-bottom: 10px;
+  font-weight: 600;
+}
+
+/* Deprescribing simulator button */
+.deprescribe-btn {
+  font-size: 0.85rem;
+  padding: 8px 14px;
+  border: 2px dashed var(--accent);
+  background: rgba(37,99,235,0.05);
+  color: var(--accent-dark);
+  border-radius: 6px;
+  cursor: pointer;
+  width: auto;
+  margin-top: 6px;
+  font-weight: 700;
+  transition: all 0.2s;
+}
+
+.deprescribe-btn:hover { background: var(--accent); color: white; border-style: solid; }
+
+.deprescribe-result {
+  margin-top: 10px;
+  padding: 12px;
+  background: rgba(5,150,105,0.08);
+  border: 1px solid rgba(5,150,105,0.3);
+  border-radius: 8px;
+  font-size: 0.85rem;
+  color: #047857;
+  display: none;
+  font-weight: 600;
+}
+
+.deprescribe-result.show { display: block; }
+
+/* Hindi text */
+.hindi-text {
+  font-size: 1rem;
+  color: #b45309;
+  background: rgba(217,119,6,0.08);
+  border: 1px solid rgba(217,119,6,0.2);
+  border-radius: 8px;
+  padding: 12px;
+  margin-top: 10px;
+  display: none;
+  font-family: 'Noto Sans Devanagari', sans-serif;
+  font-weight: 600;
+}
+
+.hindi-text.show { display: block; }
+
+/* ── BURDEN SCORE BARS ──────────────────────────────────────── */
+.burden-section {
+  margin-bottom: 24px;
+}
+
+.burden-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+
+.burden-label {
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  width: 90px;
+  flex-shrink: 0;
+}
+
+.burden-bar-bg {
+  flex: 1;
+  background: var(--bg-dark);
+  border-radius: 6px;
+  height: 12px;
+  overflow: hidden;
+  border: 1px solid var(--border);
+}
+
+.burden-bar-fill {
+  height: 100%;
+  border-radius: 6px;
+  transition: width 0.8s ease;
+  width: 0%;
+}
+
+.burden-val {
+  font-size: 0.85rem;
+  font-weight: 800;
+  width: 35px;
+  text-align: right;
+  color: var(--text-primary);
+}
+
+/* ── TIMELINE PANEL ─────────────────────────────────────────── */
+.timeline-row {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  margin-bottom: 10px;
+  font-size: 0.9rem;
+  border: 1px solid var(--border);
+  background: #ffffff;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.03);
+}
+
+.timeline-row.safe { border-left: 5px solid var(--risk-low); }
+.timeline-row.new { border-left: 5px solid var(--accent); }
+.timeline-row.risky { border-left: 5px solid var(--risk-high); background: rgba(220,38,38,0.05); }
+.timeline-row.stopped { border-left: 5px solid var(--text-muted); opacity: 0.7; }
+
+.timeline-icon { font-size: 1.2rem; }
+.timeline-name { flex: 1; font-weight: 700; color: var(--text-primary); }
+.timeline-tag { font-size: 0.75rem; color: var(--text-muted); font-weight: 600; }
+
+/* ── SECTION DIVIDERS ───────────────────────────────────────── */
+.section-label {
+  font-size: 0.8rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--text-muted);
+  margin: 24px 0 10px;
+  font-weight: 800;
+}
+
+/* ── EMPTY STATE ────────────────────────────────────────────── */
+.empty-state {
+  text-align: center;
+  padding: 60px 20px;
+  color: var(--text-muted);
+}
+
+.empty-state .icon { font-size: 3.5rem; margin-bottom: 16px; }
+.empty-state p { font-size: 0.95rem; line-height: 1.6; font-weight: 600;}
+
+/* ── SCROLLBAR STYLING ──────────────────────────────────────── */
+::-webkit-scrollbar { width: 8px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: #94a3b8; border-radius: 4px; }
+::-webkit-scrollbar-thumb:hover { background: #64748b; }
