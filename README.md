@@ -13,18 +13,18 @@ Elderly patients managing multiple prescriptions face a high risk of accidental 
 Electra introduces a zero-friction, hardware-assisted safety net:
 * **Instant Recognition:** Patients simply tap a medicine bottle (fitted with an NFC sticker) against the Electra edge device.
 * **Predictive Clinical Analysis:** The FastAPI backend instantly cross-references the scanned medicines against 29 clinical safety rules, Ayurvedic herb interactions, and the patient's specific health profile.
-* **Physical Intervention:** If a critical risk is detected (e.g., a bleeding risk or accidental duplicate medication), the system physically locks the specific medicine drawer, flashes a red warning LED, sounds a localized Hindi audio warning, and sends an emergency WhatsApp alert to the caregiver.
+* **Physical Intervention:** If a critical risk is detected, the system physically locks the specific medicine drawer, flashes a red warning LED, sounds a localized Hindi audio warning, and sends an emergency WhatsApp alert to the caregiver.
 
 ---
 
 ## ✨ Key Features
 
-* 🧠 **Advanced Clinical Rules Engine:** Evaluates 29 distinct safety rules, covering severe drug-drug interactions, food conflicts, pregnancy/lactation risks, and patient-specific contraindications.
-* 🏷️ **Dynamic NFC Provisioning:** A live tag-mapping system allows caregivers to instantly assign or reassign NFC tags to specific generic or brand medicines via the web dashboard—without editing a single line of hardware code.
-* 🔒 **Automated Hardware Defense:** Uses precision servo motors to physically lock the compartment containing the dangerous medication, preventing accidental ingestion.
-* 🗣️ **Localized Audio Warnings:** Integrates a DFPlayer Mini to provide immediate, rule-specific spoken warnings in Hindi (e.g., specific alerts for kidney strain or bleeding risks).
-* ⏰ **Synchronized Dose Scheduling:** An NTP-synced scheduling system triggers physical hardware alarms and sends WhatsApp reminders to caregivers at the exact prescribed minute.
-* ❤️ **Live Vitals Monitoring:** Features an integrated MAX30100 pulse oximeter running on a dedicated FreeRTOS core to continuously sample, average, and display patient SpO2 and BPM on an OLED screen without blocking the I2C bus.
+* 🧠 **Advanced Clinical Rules Engine:** Evaluates 29 distinct safety rules, covering severe drug-drug interactions, food conflicts, and patient-specific contraindications.
+* 🏷️ **Dynamic NFC Provisioning:** A live tag-mapping system allows caregivers to instantly assign or reassign NFC tags via the web dashboard—without editing hardware code.
+* 🔒 **Automated Hardware Defense:** Uses precision servo motors to physically lock the compartment containing the dangerous medication.
+* 🗣️ **Localized Audio Warnings:** Integrates a DFPlayer Mini to provide immediate, rule-specific spoken warnings in Hindi.
+* ⏰ **Synchronized Dose Scheduling:** An NTP-synced scheduling system triggers hardware alarms and sends WhatsApp reminders to caregivers at the exact prescribed minute.
+* ❤️ **Live Vitals Monitoring:** Features an integrated MAX30100 pulse oximeter running on a dedicated FreeRTOS core to sample and display SpO2 and BPM on an OLED screen.
 
 ---
 
@@ -34,9 +34,9 @@ Electra is built as a distributed, multi-node system to ensure stability, respon
 
 | Component | Tech Stack | Role & Responsibility |
 | :--- | :--- | :--- |
-| **The IoT Edge Hub** | C++, ESP32 (Arduino) | The physical hardware. Manages I2C/SPI buses for the OLED, RFID scanner, servos, DFPlayer speaker, and pulse oximeter via FreeRTOS. |
-| **The Virtual Brain** | Python, FastAPI | The backend server. Runs the clinical rule algorithms, manages the live tag map, and handles the WhatsApp API integration. |
 | **The Command Dashboard** | HTML, CSS, JavaScript | The frontend UI. Handles live NFC tag enrollment, dose scheduling, patient profile configuration, and visual analysis rendering. |
+| **The Virtual Brain** | Python, FastAPI | The backend server. Runs the clinical rule algorithms, manages the live tag map, and handles the WhatsApp API integration. |
+| **The IoT Edge Hub** | C++, ESP32 (Arduino) | The physical hardware. Manages I2C/SPI buses for the OLED, RFID scanner, servos, DFPlayer speaker, and pulse oximeter via FreeRTOS. |
 
 ---
 
@@ -48,6 +48,19 @@ Electra is built as a distributed, multi-node system to ensure stability, respon
 ```bash
 git clone [https://github.com/patelvishwa2302-blip/Electra.git](https://github.com/patelvishwa2302-blip/Electra.git)
 cd Electra
+```
+
+**2. Install Dependencies**
+Ensure Python 3.9+ is installed, then navigate to the backend folder and run:
+```bash
+pip install fastapi uvicorn
+```
+
+**3. Run the Virtual Brain (Backend)**
+```bash
+uvicorn main:app --host 0.0.0.0 --port 8000
+```
+
 **4. Run the Command Dashboard**
 Open `index.html` from the Frontend folder in any web browser to connect to the local server.
 
@@ -81,4 +94,4 @@ Once the dashboard opens in your browser (`http://localhost:8000`) and the ESP32
 
 ## 🎯 Conclusion
 
-Electra proves that smart healthcare IoT can prevent fatal polypharmacy errors. By combining a predictive clinical rule engine with physical hardware locks and localized audio warnings, it creates a self-healing medication management system.
+Electra proves that smart healthcare IoT can prevent fatal polypharmacy errors. By combining a predictive clinical rule engine with physical hardware locks and localized audio warnings, it creates a self-healing medication management system.f-healing medication management system.
