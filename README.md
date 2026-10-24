@@ -32,11 +32,11 @@ Electra introduces a zero-friction, hardware-assisted safety net:
 
 Electra is built as a distributed, multi-node system to ensure stability, responsiveness, and separation of concerns.
 
-| Component | Tech Stack | Role & Responsibility | Lead Developer |
-| :--- | :--- | :--- | :--- |
-| **The IoT Edge Hub** | C++, ESP32 (Arduino) | The physical hardware. Manages I2C/SPI buses for the OLED, RFID scanner, servos, DFPlayer speaker, and pulse oximeter via FreeRTOS. | Yashasvi |
-| **The Virtual Brain** | Python, FastAPI | The backend server. Runs the clinical rule algorithms, manages the live tag map, and handles the WhatsApp API integration. | Bhavya |
-| **The Command Dashboard** | HTML, CSS, JavaScript | The frontend UI. Handles live NFC tag enrollment, dose scheduling, patient profile configuration, and visual analysis rendering. | Vishwa |
+| Component | Tech Stack | Role & Responsibility |
+| :--- | :--- | :--- |
+| **The IoT Edge Hub** | C++, ESP32 (Arduino) | The physical hardware. Manages I2C/SPI buses for the OLED, RFID scanner, servos, DFPlayer speaker, and pulse oximeter via FreeRTOS. |
+| **The Virtual Brain** | Python, FastAPI | The backend server. Runs the clinical rule algorithms, manages the live tag map, and handles the WhatsApp API integration. |
+| **The Command Dashboard** | HTML, CSS, JavaScript | The frontend UI. Handles live NFC tag enrollment, dose scheduling, patient profile configuration, and visual analysis rendering. |
 
 ---
 
