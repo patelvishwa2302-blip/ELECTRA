@@ -42,7 +42,43 @@ Electra is built as a distributed, multi-node system to ensure stability, respon
 
 ## 🚀 Installation & Quick Start
 
+*(Electra is designed to run completely locally on your own machine and edge network without complex database setups.)*
+
 **1. Clone the Repository**
 ```bash
 git clone [https://github.com/patelvishwa2302-blip/Electra.git](https://github.com/patelvishwa2302-blip/Electra.git)
 cd Electra
+**4. Run the Command Dashboard**
+Open `index.html` from the Frontend folder in any web browser to connect to the local server.
+
+---
+
+## 🎮 Interactive Demo Guide
+
+Once the dashboard opens in your browser (`http://localhost:8000`) and the ESP32 is powered on:
+
+1. **Watch the Baseline** — Scan a single, safe medicine. Observe the OLED display the name and the Green LED light up in the "Safe" zone.
+2. **Trigger a Hazard** — Click the **Assign** button on the dashboard to map a new NFC tag, then scan two conflicting medicines.
+3. **Observe the IoT Defense:**
+   * Watch the **Red LED** flash and the **Buzzer** sound the alarm.
+   * Hear the **DFPlayer Mini** announce the specific bleeding risk warning in Hindi.
+   * See the **Servo Motor** physically lock Compartment 3 to prevent access.
+   * Read the automated **WhatsApp Alert** on the caregiver's phone.
+
+---
+
+## 🛠️ Built With
+
+| Library / Tech | Purpose |
+| :--- | :--- |
+| [FastAPI](https://fastapi.tiangolo.com/) | High-performance backend server and clinical rule engine |
+| [FreeRTOS](https://www.freertos.org/) | Multi-tasking on the ESP32 to keep vitals sampling uninterrupted |
+| [ESP32Servo](https://madhephaestus.github.io/ESP32Servo/) | Hardware PWM control for the physical compartment locks |
+| [DFPlayer Mini](https://wiki.dfrobot.com/DFPlayer_Mini_SKU_DFR0299) | Localized Hindi audio warnings mapped from SD card files |
+| Vanilla HTML/JS | Lightweight, reactive web frontend without heavy frameworks |
+
+---
+
+## 🎯 Conclusion
+
+Electra proves that smart healthcare IoT can prevent fatal polypharmacy errors. By combining a predictive clinical rule engine with physical hardware locks and localized audio warnings, it creates a self-healing medication management system.
