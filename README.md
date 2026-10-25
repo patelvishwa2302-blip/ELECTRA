@@ -74,17 +74,12 @@ Install via Arduino IDE → Library Manager:
 | Button ANALYZE / RESET | 26 / 27 |
 | DFPlayer RX / TX | 16 / 17 |
 
-Full table: [`../hardware/PINOUT.md`](../hardware/PINOUT.md)
-
 ---
 
 ## SD card (for the DFPlayer)
 
 - **FAT32**, folder `01/`, files named `001.mp3` … `013.mp3` (3 digits)
 - Clips must be **128 kbps CBR, 44.1 kHz** (VBR clips fail to play)
-
-Clip mapping: [`../voice/README.md`](../voice/README.md)
-
 ---
 
 ## What the firmware does
