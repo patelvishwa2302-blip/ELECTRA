@@ -1,0 +1,45 @@
+# ── secrets (NEVER commit) ─────────────────────────────
+secrets.h
+config_local.h
+.env
+.env.local
+
+# ── Arduino / PlatformIO build output ──────────────────
+build/
+.pio/
+.pioenvs/
+.piolibdeps/
+*.bin
+*.elf
+*.hex
+*.map
+*.d
+*.o
+
+# ── IDE / editor ───────────────────────────────────────
+.vscode/
+.idea/
+*.bak
+*.orig
+*.swp
+
+# ── OS ─────────────────────────────────────────────────
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# ── large media (link these, don't commit them) ────────
+*.mp4
+*.mov
+*.avi
+*.mkv
+
+# ── python ─────────────────────────────────────────────
+__pycache__/
+*.pyc
+venv/
+.venv/
+
+# ── node ───────────────────────────────────────────────
+node_modules/
+dist/
