@@ -88,11 +88,11 @@
 // ============================================================
 // 1. CONFIGURATION
 // ============================================================
-const char* WIFI_SSID  = "Airtel_Namu";
-const char* WIFI_PASS  = "Satvik@9327132765";
+const char* WIFI_SSID  = "your-wifi-name";
+const char* WIFI_PASS  = "your-wifi-password";
 
 // NO trailing slash. The IP must be the LAPTOP's IP on the same hotspot.
-const char* BACKEND_BASE = "https://tinfoil-punctured-busload.ngrok-free.dev";
+const char* BACKEND_BASE = "http://backends-ip:8000";
 const char* DEVICE_ID    = "electra-001";
 
 // ============================================================
